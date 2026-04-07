@@ -327,7 +327,7 @@ export function NoteEditor() {
               }
             }}
             placeholder="Начните писать заметку..."
-            className="w-full min-h-[400px] bg-transparent border-0 outline-none resize-none text-foreground leading-relaxed placeholder:text-muted-foreground/50 font-mono"
+            className="w-full min-h-[400px] bg-transparent border-0 outline-none resize-none text-foreground leading-relaxed placeholder:text-muted-foreground/50"
           />
         </div>
       </div>
