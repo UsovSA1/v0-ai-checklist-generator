@@ -1,28 +1,35 @@
 'use client'
 
+import { AppHeader } from '@/components/app-header'
 import { AppSidebar } from '@/components/app-sidebar'
 import { MainContent } from '@/components/main-content'
 import { ChecklistPanel } from '@/components/checklist-panel'
 import { useAppStore } from '@/lib/store'
 
 export default function Home() {
-  const { activeTab, selectedNoteId, isTaskDetailOpen } = useAppStore()
+  const { activeTab, selectedNoteId } = useAppStore()
   
   // Determine layout based on active tab
-  // Tasks tab has its own internal layout (no sidebar unless in detail mode which is handled internally)
+  // Tasks tab has its own internal layout (no sidebar)
   const showSidebar = activeTab !== 'tasks'
   const showChecklistPanel = activeTab === 'notes' && selectedNoteId
   
   return (
-    <div className="h-screen flex overflow-hidden">
-      {/* Left Sidebar - only for notes/checklists tabs, or tasks detail view */}
-      {showSidebar && <AppSidebar />}
+    <div className="h-screen flex flex-col overflow-hidden">
+      {/* Fixed Header */}
+      <AppHeader />
       
-      {/* Main Content */}
-      <MainContent />
-      
-      {/* Right Panel - Checklist (only in notes tab) */}
-      {showChecklistPanel && <ChecklistPanel />}
+      {/* Content Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Sidebar - only for notes/checklists tabs */}
+        {showSidebar && <AppSidebar />}
+        
+        {/* Main Content */}
+        <MainContent />
+        
+        {/* Right Panel - Checklist (only in notes tab) */}
+        {showChecklistPanel && <ChecklistPanel />}
+      </div>
     </div>
   )
 }

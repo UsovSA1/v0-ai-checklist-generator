@@ -1,10 +1,9 @@
 'use client'
 
-import { Search, Plus, Settings, Filter } from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { NoteCard } from './note-card'
 import { ChecklistCard } from './checklist-card'
 
@@ -58,21 +57,6 @@ export function AppSidebar() {
 
   return (
     <aside className="w-72 h-full flex flex-col border-r border-border bg-muted">
-      {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-border">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-semibold tracking-tight text-foreground">do it</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Filter className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
       {/* Search */}
       <div className="p-3">
         <div className="relative">
