@@ -3,6 +3,7 @@
 import { CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatRelativeDate } from '@/lib/date-utils'
+import { Badge } from '@/components/ui/badge'
 import type { Note } from '@/lib/types'
 
 interface NoteCardProps {
@@ -39,15 +40,23 @@ export function NoteCard({ note, hasChecklist, isSelected, onClick }: NoteCardPr
         {preview}
       </div>
       
-      {/* Checklist indicator */}
-      {hasChecklist && (
-        <div className="flex items-center gap-1">
+      {/* Tags and checklist indicator */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {note.tags.slice(0, 2).map((tag) => (
+          <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0 h-5">
+            {tag}
+          </Badge>
+        ))}
+        {note.tags.length > 2 && (
+          <span className="text-xs text-muted-foreground">+{note.tags.length - 2}</span>
+        )}
+        {hasChecklist && (
           <span className="flex items-center gap-0.5 text-xs text-success">
             <CheckCircle2 className="h-3 w-3" />
             чеклист
           </span>
-        </div>
-      )}
+        )}
+      </div>
     </button>
   )
 }

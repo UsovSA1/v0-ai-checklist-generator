@@ -19,6 +19,9 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2)
 }
 
+type SortOrder = 'asc' | 'desc'
+type TagFilter = string | null
+
 interface AppState {
   // Data
   notes: Note[]
@@ -31,6 +34,8 @@ interface AppState {
   selectedTaskId: string | null
   isTaskDetailOpen: boolean
   searchQuery: string
+  sortOrder: SortOrder
+  tagFilter: TagFilter
   
   // Track if note content changed since last AI generation
   noteContentChanged: Map<string, boolean>
@@ -56,6 +61,9 @@ interface AppState {
   // Actions - UI
   setActiveTab: (tab: TabType) => void
   setSearchQuery: (query: string) => void
+  setSortOrder: (order: SortOrder) => void
+  setTagFilter: (tag: TagFilter) => void
+  getAllTags: () => string[]
   
   // Actions - AI
   canGenerateChecklist: (noteId: string) => boolean
@@ -198,7 +206,7 @@ const mockChecklists: Checklist[] = [
       {
         id: 'item-8',
         checklistId: 'checklist-3',
-        text: 'Настроить регулярные синки между командами',
+        text: 'Настроить регулярные синки ме��ду командами',
         status: 'done',
         category: 'work',
         deadline: null,
@@ -223,17 +231,28 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedTaskId: null,
   isTaskDetailOpen: false,
   searchQuery: '',
+  sortOrder: 'desc',
+  tagFilter: null,
   noteContentChanged: new Map(),
   
   // Notes actions
   createNote: () => {
+    const now = new Date()
+    const defaultTitle = now.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).replace(',', '')
+    
     const newNote: Note = {
       id: generateId(),
-      title: 'Новая заметка',
+      title: defaultTitle,
       content: '',
       tags: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
       contentHash: generateHash(''),
     }
     set((state) => ({
@@ -409,6 +428,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   setActiveTab: (tab) => set({ activeTab: tab, isTaskDetailOpen: false }),
   
   setSearchQuery: (query) => set({ searchQuery: query }),
+  
+  setSortOrder: (order) => set({ sortOrder: order }),
+  
+  setTagFilter: (tag) => set({ tagFilter: tag }),
+  
+  getAllTags: () => {
+    const { notes } = get()
+    const tagsSet = new Set<string>()
+    notes.forEach((note) => {
+      note.tags.forEach((tag) => tagsSet.add(tag))
+    })
+    return Array.from(tagsSet).sort()
+  },
   
   // AI actions
   canGenerateChecklist: (noteId) => {

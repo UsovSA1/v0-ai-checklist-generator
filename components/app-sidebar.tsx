@@ -1,9 +1,10 @@
 'use client'
 
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, ArrowUpDown, X } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { NoteCard } from './note-card'
 import { ChecklistCard } from './checklist-card'
 
@@ -19,23 +20,45 @@ export function AppSidebar() {
     selectNote,
     selectChecklist,
     createNote,
+    sortOrder,
+    setSortOrder,
+    tagFilter,
+    setTagFilter,
+    getAllTags,
   } = useAppStore()
 
-  // Filter based on active tab and search
-  const filteredNotes = notes.filter((note) => {
-    if (!searchQuery) return true
-    return (
-      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })
+  const allTags = getAllTags()
 
-  const filteredChecklists = checklists.filter((checklist) => {
-    const note = notes.find((n) => n.id === checklist.noteId)
-    const title = note?.title || 'Удаленная заметка'
-    if (!searchQuery) return true
-    return title.toLowerCase().includes(searchQuery.toLowerCase())
-  })
+  // Filter based on active tab, search and tag
+  const filteredNotes = notes
+    .filter((note) => {
+      // Tag filter
+      if (tagFilter && !note.tags.includes(tagFilter)) return false
+      
+      // Search filter
+      if (!searchQuery) return true
+      return (
+        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        note.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    })
+    .sort((a, b) => {
+      const comparison = a.updatedAt.getTime() - b.updatedAt.getTime()
+      return sortOrder === 'desc' ? -comparison : comparison
+    })
+
+  const filteredChecklists = checklists
+    .filter((checklist) => {
+      const note = notes.find((n) => n.id === checklist.noteId)
+      const title = note?.title || 'Удаленная заметка'
+      if (!searchQuery) return true
+      return title.toLowerCase().includes(searchQuery.toLowerCase())
+    })
+    .sort((a, b) => {
+      const comparison = a.updatedAt.getTime() - b.updatedAt.getTime()
+      return sortOrder === 'desc' ? -comparison : comparison
+    })
 
   // Get item count based on active tab
   const getItemCount = () => {
@@ -50,6 +73,10 @@ export function AppSidebar() {
     }
   }
 
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')
+  }
+
   // Don't show sidebar for tasks tab
   if (activeTab === 'tasks') {
     return null
@@ -58,16 +85,55 @@ export function AppSidebar() {
   return (
     <aside className="w-72 h-full flex flex-col border-r border-border bg-muted">
       {/* Search */}
-      <div className="p-3">
+      <div className="p-3 space-y-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Поиск заметок..."
+            placeholder="Поиск..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-muted border-0"
+            className="pl-9 bg-card border-border"
           />
         </div>
+        
+        {/* Sort and Filter Controls */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleSortOrder}
+            className="gap-1 text-xs h-7"
+          >
+            <ArrowUpDown className="h-3 w-3" />
+            {sortOrder === 'desc' ? 'Новые' : 'Старые'}
+          </Button>
+        </div>
+
+        {/* Tag Filters (only for notes) */}
+        {activeTab === 'notes' && allTags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {tagFilter && (
+              <Badge 
+                variant="default" 
+                className="cursor-pointer gap-1 text-xs"
+                onClick={() => setTagFilter(null)}
+              >
+                {tagFilter}
+                <X className="h-3 w-3" />
+              </Badge>
+            )}
+            {!tagFilter && allTags.map((tag) => (
+              <Badge 
+                key={tag}
+                variant="outline" 
+                className="cursor-pointer text-xs hover:bg-accent"
+                onClick={() => setTagFilter(tag)}
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* List */}
@@ -88,6 +154,11 @@ export function AppSidebar() {
                 />
               )
             })}
+            {filteredNotes.length === 0 && (
+              <div className="text-sm text-muted-foreground text-center py-8">
+                Заметки не найдены
+              </div>
+            )}
           </div>
         )}
 
@@ -106,6 +177,11 @@ export function AppSidebar() {
                 />
               )
             })}
+            {filteredChecklists.length === 0 && (
+              <div className="text-sm text-muted-foreground text-center py-8">
+                Чеклисты не найдены
+              </div>
+            )}
           </div>
         )}
       </div>
