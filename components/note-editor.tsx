@@ -211,7 +211,7 @@ export function NoteEditor() {
       
       {/* Footer with character count */}
       <div className="px-6 py-2 border-t border-border text-right text-sm text-muted-foreground">
-        {content.length} / {MAX_CONTENT_LENGTH.toLocaleString()}
+        {content.length} / {MAX_CONTENT_LENGTH}
       </div>
     </div>
   )
