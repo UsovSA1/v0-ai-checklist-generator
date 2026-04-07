@@ -57,7 +57,7 @@ export function ChecklistPanel() {
   
   if (!checklist || items.length === 0) {
     return (
-      <aside className="w-80 h-full border-l border-border bg-card flex flex-col">
+      <aside className="w-80 h-full border-l border-border bg-muted flex flex-col">
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
@@ -72,7 +72,7 @@ export function ChecklistPanel() {
   }
   
   return (
-    <aside className="w-80 h-full border-l border-border bg-card flex flex-col">
+    <aside className="w-80 h-full border-l border-border bg-muted flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">

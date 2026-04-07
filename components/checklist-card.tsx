@@ -22,8 +22,8 @@ export function ChecklistCard({ checklist, noteTitle, isSelected, onClick }: Che
       onClick={onClick}
       className={cn(
         'w-full text-left p-3 rounded-lg transition-colors',
-        'hover:bg-accent',
-        isSelected && 'bg-accent'
+        'hover:bg-card/80',
+        isSelected && 'bg-card shadow-sm'
       )}
     >
       {/* Date */}

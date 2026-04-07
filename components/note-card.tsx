@@ -4,7 +4,6 @@ import { CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatRelativeDate } from '@/lib/date-utils'
 import type { Note } from '@/lib/types'
-import { Badge } from '@/components/ui/badge'
 
 interface NoteCardProps {
   note: Note
@@ -21,8 +20,8 @@ export function NoteCard({ note, hasChecklist, isSelected, onClick }: NoteCardPr
       onClick={onClick}
       className={cn(
         'w-full text-left p-3 rounded-lg transition-colors',
-        'hover:bg-accent',
-        isSelected && 'bg-accent'
+        'hover:bg-card/80',
+        isSelected && 'bg-card shadow-sm'
       )}
     >
       {/* Date */}
@@ -40,20 +39,15 @@ export function NoteCard({ note, hasChecklist, isSelected, onClick }: NoteCardPr
         {preview}
       </div>
       
-      {/* Tags and checklist indicator */}
-      <div className="flex items-center gap-1.5 flex-wrap">
-        {note.tags.slice(0, 2).map((tag) => (
-          <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0">
-            {tag}
-          </Badge>
-        ))}
-        {hasChecklist && (
+      {/* Checklist indicator */}
+      {hasChecklist && (
+        <div className="flex items-center gap-1">
           <span className="flex items-center gap-0.5 text-xs text-success">
             <CheckCircle2 className="h-3 w-3" />
             чеклист
           </span>
-        )}
-      </div>
+        </div>
+      )}
     </button>
   )
 }

@@ -15,7 +15,7 @@ export function MainContent() {
   const tasksCount = getAllTasks().length
   
   return (
-    <main className="flex-1 flex flex-col min-w-0 bg-background">
+    <main className="flex-1 flex flex-col min-w-0 bg-card">
       {/* Tabs Header */}
       <div className="border-b border-border px-6 py-3">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>

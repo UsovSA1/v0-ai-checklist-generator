@@ -4,8 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { Trash2, Sparkles, Check } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { formatFullDate } from '@/lib/date-utils'
 import { cn } from '@/lib/utils'
 
@@ -26,7 +24,6 @@ export function NoteEditor() {
   
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [newTag, setNewTag] = useState('')
   const [isSaved, setIsSaved] = useState(true)
   const [isGenerating, setIsGenerating] = useState(false)
   
@@ -58,23 +55,6 @@ export function NoteEditor() {
     
     return () => clearTimeout(timeout)
   }, [title, content, selectedNote?.id])
-  
-  const handleAddTag = useCallback(() => {
-    if (!selectedNote || !newTag.trim()) return
-    
-    const tag = newTag.trim().toLowerCase()
-    if (!selectedNote.tags.includes(tag)) {
-      updateNote(selectedNote.id, { tags: [...selectedNote.tags, tag] })
-    }
-    setNewTag('')
-  }, [selectedNote, newTag, updateNote])
-  
-  const handleRemoveTag = useCallback((tagToRemove: string) => {
-    if (!selectedNote) return
-    updateNote(selectedNote.id, { 
-      tags: selectedNote.tags.filter((t) => t !== tagToRemove) 
-    })
-  }, [selectedNote, updateNote])
   
   const handleDelete = useCallback(() => {
     if (!selectedNote) return
@@ -164,35 +144,8 @@ export function NoteEditor() {
           />
           
           {/* Metadata */}
-          <div className="flex items-center gap-3 text-sm text-muted-foreground mb-6">
-            <span>{formatFullDate(selectedNote.updatedAt)}</span>
-            
-            {/* Tags */}
-            <div className="flex items-center gap-1.5">
-              {selectedNote.tags.map((tag) => (
-                <Badge 
-                  key={tag} 
-                  variant="outline" 
-                  className="cursor-pointer hover:bg-destructive/10 hover:text-destructive"
-                  onClick={() => handleRemoveTag(tag)}
-                >
-                  {tag}
-                </Badge>
-              ))}
-              <input
-                type="text"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddTag()
-                  }
-                }}
-                placeholder="+ тег"
-                className="w-16 text-sm bg-transparent border-0 outline-none placeholder:text-muted-foreground/50"
-              />
-            </div>
+          <div className="text-sm text-muted-foreground mb-6">
+            {formatFullDate(selectedNote.updatedAt)}
           </div>
           
           {/* Content */}

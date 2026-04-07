@@ -57,7 +57,7 @@ export function AppSidebar() {
   }
 
   return (
-    <aside className="w-72 h-full flex flex-col border-r border-border bg-card">
+    <aside className="w-72 h-full flex flex-col border-r border-border bg-muted">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-border">
         <div className="flex items-center gap-2">
