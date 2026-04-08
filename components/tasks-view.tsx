@@ -36,6 +36,8 @@ export function TasksView() {
     updateChecklistItem,
     taskSortBy,
     setTaskSortBy,
+    taskCategoryFilter,
+    setTaskCategoryFilter,
   } = useAppStore()
   
   const tasks = getAllTasks()
@@ -199,24 +201,52 @@ export function TasksView() {
   return (
     <div className="h-full overflow-y-auto p-6">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold">Все задачи</h1>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Сортировка:</span>
-            <Button
-              variant={taskSortBy === 'status' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTaskSortBy('status')}
-            >
-              По статусу
-            </Button>
-            <Button
-              variant={taskSortBy === 'deadline' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTaskSortBy('deadline')}
-            >
-              По сроку
-            </Button>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold mb-4">Все задачи</h1>
+          
+          {/* Filters and sorting */}
+          <div className="flex items-center gap-6">
+            {/* Category filter */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Категория:</span>
+              <Select
+                value={taskCategoryFilter}
+                onValueChange={(value) => setTaskCategoryFilter(value as any)}
+              >
+                <SelectTrigger className="h-8 w-auto text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все</SelectItem>
+                  <SelectItem value="work">работа</SelectItem>
+                  <SelectItem value="personal">личное</SelectItem>
+                  <SelectItem value="health">здоровье</SelectItem>
+                  <SelectItem value="finance">финансы</SelectItem>
+                  <SelectItem value="learning">обучение</SelectItem>
+                  <SelectItem value="other">другое</SelectItem>
+                  <SelectItem value={null as any}>Без категории</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Sort */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Сортировка:</span>
+              <Button
+                variant={taskSortBy === 'status' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTaskSortBy('status')}
+              >
+                По статусу
+              </Button>
+              <Button
+                variant={taskSortBy === 'deadline' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTaskSortBy('deadline')}
+              >
+                По сроку
+              </Button>
+            </div>
           </div>
         </div>
         

@@ -22,6 +22,7 @@ function generateId(): string {
 type SortOrder = 'asc' | 'desc'
 type TagFilter = string | null
 type TaskSort = 'status' | 'deadline'
+type CategoryFilter = ChecklistItemCategory | 'all'
 
 interface AppState {
   // Data
@@ -38,6 +39,7 @@ interface AppState {
   sortOrder: SortOrder
   tagFilter: TagFilter
   taskSortBy: TaskSort
+  taskCategoryFilter: CategoryFilter
   
   // Track if note content changed since last AI generation
   noteContentChanged: Map<string, boolean>
@@ -59,6 +61,7 @@ interface AppState {
   selectTask: (id: string | null) => void
   setTaskDetailOpen: (open: boolean) => void
   setTaskSortBy: (sortBy: TaskSort) => void
+  setTaskCategoryFilter: (category: CategoryFilter) => void
   getAllTasks: () => (ChecklistItem & { noteTitle: string })[]
   
   // Actions - UI
@@ -237,6 +240,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   sortOrder: 'desc',
   tagFilter: null,
   taskSortBy: 'status',
+  taskCategoryFilter: 'all',
   noteContentChanged: new Map(),
   
   // Notes actions
@@ -396,8 +400,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   
   setTaskSortBy: (sortBy) => set({ taskSortBy: sortBy }),
   
+  setTaskCategoryFilter: (category) => set({ taskCategoryFilter: category }),
+  
   getAllTasks: () => {
-    const { checklists, notes, taskSortBy } = get()
+    const { checklists, notes, taskSortBy, taskCategoryFilter } = get()
     const tasks: (ChecklistItem & { noteTitle: string })[] = []
     
     checklists.forEach((cl) => {
@@ -405,6 +411,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       const noteTitle = note?.title || 'Удаленная заметка'
       
       cl.items.forEach((item) => {
+        // Apply category filter
+        if (taskCategoryFilter !== 'all' && item.category !== taskCategoryFilter) {
+          return
+        }
+        
         tasks.push({
           ...item,
           noteTitle,
