@@ -21,6 +21,7 @@ function generateId(): string {
 
 type SortOrder = 'asc' | 'desc'
 type TagFilter = string | null
+type TaskSort = 'status' | 'deadline'
 
 interface AppState {
   // Data
@@ -36,6 +37,7 @@ interface AppState {
   searchQuery: string
   sortOrder: SortOrder
   tagFilter: TagFilter
+  taskSortBy: TaskSort
   
   // Track if note content changed since last AI generation
   noteContentChanged: Map<string, boolean>
@@ -56,6 +58,7 @@ interface AppState {
   // Actions - Tasks
   selectTask: (id: string | null) => void
   setTaskDetailOpen: (open: boolean) => void
+  setTaskSortBy: (sortBy: TaskSort) => void
   getAllTasks: () => (ChecklistItem & { noteTitle: string })[]
   
   // Actions - UI
@@ -233,6 +236,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   searchQuery: '',
   sortOrder: 'desc',
   tagFilter: null,
+  taskSortBy: 'status',
   noteContentChanged: new Map(),
   
   // Notes actions
@@ -390,8 +394,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   
   setTaskDetailOpen: (open) => set({ isTaskDetailOpen: open }),
   
+  setTaskSortBy: (sortBy) => set({ taskSortBy: sortBy }),
+  
   getAllTasks: () => {
-    const { checklists, notes } = get()
+    const { checklists, notes, taskSortBy } = get()
     const tasks: (ChecklistItem & { noteTitle: string })[] = []
     
     checklists.forEach((cl) => {
@@ -406,21 +412,34 @@ export const useAppStore = create<AppState>((set, get) => ({
       })
     })
     
-    // Sort: pending first, then by deadline (closest first, no deadline last)
+    // Sort based on taskSortBy
     return tasks.sort((a, b) => {
-      // First by status
-      if (a.status !== b.status) {
-        return a.status === 'pending' ? -1 : 1
+      if (taskSortBy === 'status') {
+        // Sort by status: pending first, then done
+        if (a.status !== b.status) {
+          return a.status === 'pending' ? -1 : 1
+        }
+        // Within same status, sort by deadline
+        if (a.deadline && b.deadline) {
+          return a.deadline.getTime() - b.deadline.getTime()
+        }
+        if (a.deadline) return -1
+        if (b.deadline) return 1
+        return 0
+      } else {
+        // Sort by deadline: closest first, no deadline last
+        if (a.deadline && b.deadline) {
+          return a.deadline.getTime() - b.deadline.getTime()
+        }
+        if (a.deadline) return -1
+        if (b.deadline) return 1
+        
+        // If both no deadline, sort by status
+        if (a.status !== b.status) {
+          return a.status === 'pending' ? -1 : 1
+        }
+        return 0
       }
-      
-      // Then by deadline
-      if (a.deadline && b.deadline) {
-        return a.deadline.getTime() - b.deadline.getTime()
-      }
-      if (a.deadline) return -1
-      if (b.deadline) return 1
-      
-      return 0
     })
   },
   

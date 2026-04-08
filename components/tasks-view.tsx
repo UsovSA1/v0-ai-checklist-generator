@@ -34,6 +34,8 @@ export function TasksView() {
     isTaskDetailOpen,
     setTaskDetailOpen,
     updateChecklistItem,
+    taskSortBy,
+    setTaskSortBy,
   } = useAppStore()
   
   const tasks = getAllTasks()
@@ -197,7 +199,26 @@ export function TasksView() {
   return (
     <div className="h-full overflow-y-auto p-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-6">Все задачи</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-semibold">Все задачи</h1>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Сортировка:</span>
+            <Button
+              variant={taskSortBy === 'status' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTaskSortBy('status')}
+            >
+              По статусу
+            </Button>
+            <Button
+              variant={taskSortBy === 'deadline' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTaskSortBy('deadline')}
+            >
+              По сроку
+            </Button>
+          </div>
+        </div>
         
         {tasks.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
